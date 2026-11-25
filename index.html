@@ -1,0 +1,953 @@
+<title>LYRA</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap">
+
+<style>
+/* Layout: hero fullbleed → feature bands alternados → CTA final
+   Tokens: tema escuro espacial com roxo vibrante como acento */
+:root {
+  --bg:       #0a0a0f;
+  --bg2:      #0f0f1a;
+  --bg3:      #141424;
+  --surface:  #1a1a2e;
+  --border:   rgba(130,100,255,0.15);
+  --fg:       #e8e6f0;
+  --fg2:      #9b97b5;
+  --accent:   #7c5cfc;
+  --accent2:  #a855f7;
+  --accent3:  #06d6a0;
+  --danger:   #ff5370;
+  --glow:     rgba(124,92,252,0.25);
+
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg:      #f5f4ff;
+    --bg2:     #eeecff;
+    --bg3:     #e8e5ff;
+    --surface: #fff;
+    --border:  rgba(124,92,252,0.2);
+    --fg:      #18152e;
+    --fg2:     #5a5478;
+    --glow:    rgba(124,92,252,0.12);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg:      #f5f4ff;
+  --bg2:     #eeecff;
+  --bg3:     #e8e5ff;
+  --surface: #fff;
+  --border:  rgba(124,92,252,0.2);
+  --fg:      #18152e;
+  --fg2:     #5a5478;
+  --glow:    rgba(124,92,252,0.12);
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: env(safe-area-inset-top, 0px);
+  left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 1rem;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+  background: rgba(10,10,15,0.75);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  background: rgba(10,10,15,0.75);
+  z-index: 101;
+}
+
+.nav-logo {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-decoration: none;
+}
+.nav-cta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 100px;
+  text-decoration: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.nav-cta:hover { opacity: 0.85; transform: translateY(-1px); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-block: calc(env(safe-area-inset-top, 0px) + 6rem) 4rem;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,92,252,0.3) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(168,85,247,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 10% 60%, rgba(6,214,160,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* estrelas */
+.stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  animation: twinkle var(--d) ease-in-out infinite var(--delay);
+  opacity: 0;
+}
+@keyframes twinkle {
+  0%,100% { opacity:0; transform:scale(0.8); }
+  50% { opacity:var(--o); transform:scale(1); }
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(124,92,252,0.1);
+  border: 1px solid rgba(124,92,252,0.3);
+  border-radius: 100px;
+  padding: 0.35rem 1rem;
+  margin-bottom: 1.5rem;
+}
+.hero-eyebrow span { font-size: 0.75em; opacity: 0.6; }
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 10vw, 7rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-wrap: balance;
+  margin-bottom: 0.25em;
+  background: linear-gradient(170deg, #fff 20%, var(--accent2) 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  color: var(--fg2);
+  max-width: 540px;
+  margin: 0 auto 2.5rem;
+  text-wrap: balance;
+  line-height: 1.5;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 0.9rem 2rem;
+  border-radius: 100px;
+  text-decoration: none;
+  box-shadow: 0 0 32px var(--glow);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 48px rgba(124,92,252,0.4);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: transparent;
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  padding: 0.9rem 2rem;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+.btn-secondary:hover { background: var(--surface); border-color: rgba(124,92,252,0.4); }
+
+.hero-note {
+  margin-top: 1.5rem;
+  font-size: 0.8rem;
+  color: var(--fg2);
+}
+.hero-note a { color: var(--accent); text-decoration: none; }
+
+/* phone mockup */
+.phone-wrap {
+  margin-top: 4rem;
+  position: relative;
+  display: inline-block;
+}
+.phone {
+  width: min(280px, 72vw);
+  aspect-ratio: 9/19.5;
+  background: var(--surface);
+  border-radius: 32px;
+  border: 1.5px solid var(--border);
+  overflow: hidden;
+  box-shadow: 0 0 60px var(--glow), 0 40px 80px rgba(0,0,0,0.6);
+  position: relative;
+}
+.phone-screen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(170deg, #0d0d20 0%, #12122a 100%);
+  display: flex;
+  flex-direction: column;
+}
+.phone-notch {
+  width: 40%;
+  height: 20px;
+  background: #000;
+  border-radius: 0 0 12px 12px;
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+.phone-content {
+  padding: 12px 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: hidden;
+}
+.phone-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.phone-title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.phone-lock {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: rgba(124,92,252,0.2);
+  display: grid;
+  place-items: center;
+  font-size: 9px;
+}
+.phone-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.ptab {
+  flex: 1;
+  text-align: center;
+  font-size: 7px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  padding: 4px 0;
+  border-radius: 6px;
+  color: var(--fg2);
+}
+.ptab.active {
+  background: rgba(124,92,252,0.2);
+  color: var(--accent);
+}
+.phone-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  flex: 1;
+}
+.pfile {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.pfile::after {
+  content: "🔒";
+  position: absolute;
+  bottom: 2px;
+  right: 3px;
+  font-size: 7px;
+}
+.pfile.c1 { background: linear-gradient(135deg, #1e1340, #2a1b5e); }
+.pfile.c2 { background: linear-gradient(135deg, #0d2b1d, #1a4a2e); }
+.pfile.c3 { background: linear-gradient(135deg, #2b1515, #4a1e1e); }
+.pfile.c4 { background: linear-gradient(135deg, #1a1535, #2a2252); }
+.pfile.c5 { background: linear-gradient(135deg, #261520, #42253a); }
+.pfile.c6 { background: linear-gradient(135deg, #151a2b, #1e2a46); }
+
+.phone-glow {
+  position: absolute;
+  inset: -40px;
+  background: radial-gradient(ellipse 60% 40% at 50% 100%, rgba(124,92,252,0.3), transparent);
+  pointer-events: none;
+}
+
+/* ── BANDA MARCAS ── */
+.band-trusted {
+  padding: 1.5rem 0;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.band-inner {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  animation: marquee 20s linear infinite;
+  width: max-content;
+}
+@media (prefers-reduced-motion: reduce) { .band-inner { animation: none; } }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.band-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--fg2);
+  white-space: nowrap;
+}
+.band-icon { font-size: 1rem; }
+
+/* ── FEATURES ── */
+.section {
+  padding: 6rem max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+.section-label::before {
+  content: "";
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  text-wrap: balance;
+  margin-bottom: 1rem;
+}
+
+.section-desc {
+  font-size: 1.1rem;
+  color: var(--fg2);
+  max-width: 520px;
+  line-height: 1.65;
+}
+
+/* feature grid 2+2+2 */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5px;
+  background: var(--border);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 4rem;
+}
+
+.feature-card {
+  background: var(--bg);
+  padding: 2rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: background 0.2s;
+}
+.feature-card:hover { background: var(--bg2); }
+
+.feature-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 1.3rem;
+  margin-bottom: 0.25rem;
+}
+.fi-purple { background: rgba(124,92,252,0.15); }
+.fi-green  { background: rgba(6,214,160,0.12); }
+.fi-pink   { background: rgba(255,83,112,0.12); }
+.fi-blue   { background: rgba(80,160,255,0.12); }
+.fi-yellow { background: rgba(255,200,80,0.12); }
+.fi-teal   { background: rgba(0,210,180,0.12); }
+
+.feature-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.feature-card p {
+  font-size: 0.9rem;
+  color: var(--fg2);
+  line-height: 1.6;
+}
+
+/* ── COMO FUNCIONA ── */
+.how-band {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 2.5rem;
+  margin-top: 3.5rem;
+  counter-reset: step;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  counter-increment: step;
+  position: relative;
+}
+.step::before {
+  content: counter(step, decimal-leading-zero);
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--border);
+  line-height: 1;
+}
+.step h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.step p {
+  font-size: 0.9rem;
+  color: var(--fg2);
+  line-height: 1.6;
+}
+
+/* ── SEGURANÇA DESTAQUE ── */
+.security-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+@media (max-width: 700px) {
+  .security-split { grid-template-columns: 1fr; gap: 2.5rem; }
+}
+
+.crypto-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: var(--fg2);
+  line-height: 1.8;
+  position: relative;
+  overflow: hidden;
+}
+.crypto-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+}
+.ck { color: var(--accent); }
+.cv { color: var(--accent2); }
+.cs { color: var(--accent3); }
+.cc { color: var(--fg2); opacity: 0.5; }
+
+/* ── SPEC CHIPS ── */
+.spec-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.spec-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.spec-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  margin-top: 0.5rem;
+}
+.spec-item strong {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: block;
+}
+.spec-item span {
+  font-size: 0.85rem;
+  color: var(--fg2);
+}
+
+/* ── CTA FINAL ── */
+.cta-band {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+}
+.cta-inner {
+  text-align: center;
+  padding: 7rem max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+  max-width: 700px;
+  margin: 0 auto;
+}
+.cta-inner h2 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  text-wrap: balance;
+  margin-bottom: 1rem;
+}
+.cta-inner p { font-size: 1.1rem; color: var(--fg2); margin-bottom: 2.5rem; }
+
+.version-badge {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--fg2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 0.3rem 0.9rem;
+  margin-top: 1.25rem;
+}
+
+/* ── FOOTER ── */
+footer {
+  padding: 2rem max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+  padding-bottom: max(2rem, env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.footer-logo {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+}
+.footer-links a {
+  color: var(--fg2);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--fg); }
+.footer-note { font-size: 0.8rem; color: var(--fg2); }
+</style>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">LYRA</a>
+  <a class="nav-cta" href="https://github.com/MarcioSchuenk/lyra-releases/releases/latest/download/lyra.apk">
+    ↓ Baixar
+  </a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="stars" id="stars"></div>
+
+  <div class="hero-eyebrow">
+    🔒 Privacidade real <span>·</span> Android
+  </div>
+  <h1>Seus arquivos.<br>Só seus.</h1>
+  <p class="hero-sub">
+    LYRA criptografa fotos, vídeos e documentos com AES-256-GCM.
+    Nenhuma nuvem. Nenhum servidor. Só você tem a chave.
+  </p>
+  <div class="hero-actions">
+    <a class="btn-primary" href="https://github.com/MarcioSchuenk/lyra-releases/releases/latest/download/lyra.apk">
+      ↓ Baixar APK grátis
+    </a>
+    <a class="btn-secondary" href="https://github.com/MarcioSchuenk/lyra-releases">
+      Ver versões
+    </a>
+  </div>
+  <p class="hero-note">
+    Android 7+ · Código aberto · <a href="https://github.com/MarcioSchuenk/lyra-releases">GitHub</a>
+  </p>
+
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="phone-notch"></div>
+        <div class="phone-content">
+          <div class="phone-topbar">
+            <span class="phone-title">LYRA</span>
+            <div class="phone-lock">🔒</div>
+          </div>
+          <div class="phone-tabs">
+            <div class="ptab">Arquivos</div>
+            <div class="ptab active">Protegidos</div>
+            <div class="ptab">Ajustes</div>
+          </div>
+          <div class="phone-grid">
+            <div class="pfile c1">🖼</div>
+            <div class="pfile c2">🎬</div>
+            <div class="pfile c3">📄</div>
+            <div class="pfile c4">🖼</div>
+            <div class="pfile c5">🎬</div>
+            <div class="pfile c6">🖼</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-glow"></div>
+  </div>
+</section>
+
+<!-- BANDA MARQUEE -->
+<div class="band-trusted">
+  <div class="band-inner" id="marquee">
+    <span class="band-item"><span class="band-icon">🔐</span> AES-256-GCM</span>
+    <span class="band-item"><span class="band-icon">🔑</span> PBKDF2-SHA256</span>
+    <span class="band-item"><span class="band-icon">📴</span> Sem nuvem</span>
+    <span class="band-item"><span class="band-icon">🗑</span> Lixeira segura</span>
+    <span class="band-item"><span class="band-icon">🧮</span> Ícone disfarçado</span>
+    <span class="band-item"><span class="band-icon">🚨</span> Senha de pânico</span>
+    <span class="band-item"><span class="band-icon">💾</span> Backup de chave</span>
+    <span class="band-item"><span class="band-icon">🖼</span> Álbuns protegidos</span>
+    <span class="band-item"><span class="band-icon">🔐</span> AES-256-GCM</span>
+    <span class="band-item"><span class="band-icon">🔑</span> PBKDF2-SHA256</span>
+    <span class="band-item"><span class="band-icon">📴</span> Sem nuvem</span>
+    <span class="band-item"><span class="band-icon">🗑</span> Lixeira segura</span>
+    <span class="band-item"><span class="band-icon">🧮</span> Ícone disfarçado</span>
+    <span class="band-item"><span class="band-icon">🚨</span> Senha de pânico</span>
+    <span class="band-item"><span class="band-icon">💾</span> Backup de chave</span>
+    <span class="band-item"><span class="band-icon">🖼</span> Álbuns protegidos</span>
+  </div>
+</div>
+
+<!-- FUNCIONALIDADES -->
+<div class="section">
+  <div class="section-label">Funcionalidades</div>
+  <h2 class="section-title">Privacidade sem abrir mão<br>do conforto</h2>
+  <p class="section-desc">
+    Tudo que você precisa para guardar arquivos sensíveis com segurança,
+    sem depender de serviços externos nem abrir mão de uma boa experiência.
+  </p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon fi-purple">🔐</div>
+      <h3>Criptografia forte</h3>
+      <p>AES-256-GCM com chave derivada via PBKDF2-SHA256. Cada arquivo tem seu próprio nonce e tag de autenticação — sem brechas.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-green">📴</div>
+      <h3>100% offline</h3>
+      <p>Nenhum byte sai do seu aparelho. Sem conta, sem nuvem, sem servidor. Só você e sua senha.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-pink">🚨</div>
+      <h3>Senha de pânico</h3>
+      <p>Configure uma segunda senha: quem digitar ela vê o app desbloquear — mas o cofre inteiro é apagado imediatamente.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-blue">🧮</div>
+      <h3>Ícone disfarçado</h3>
+      <p>O app pode aparecer como "Calculadora" na sua gaveta de apps. Ninguém precisa saber que ele existe.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-yellow">💾</div>
+      <h3>Backup da chave</h3>
+      <p>Exporte o sal e o número de iterações para recuperar o cofre em um novo aparelho com a mesma senha mestra.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-teal">🖼</div>
+      <h3>Álbuns e busca</h3>
+      <p>Visualize arquivos agrupados por pasta, busque por nome e organize do jeito que você prefere.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-purple">🗑</div>
+      <h3>Lixeira de 30 dias</h3>
+      <p>Arquivos apagados vão para a lixeira antes de sumir. Restaure o que precisar; o restante é destruído automaticamente.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-green">📤</div>
+      <h3>Criptografar da galeria</h3>
+      <p>Compartilhe fotos e vídeos direto da galeria do Android para o LYRA — eles entram criptografados sem passar por apps de terceiros.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-blue">⏱</div>
+      <h3>Bloqueio automático</h3>
+      <p>O cofre se tranca sozinho depois que o app vai para o segundo plano. Você define o tempo — ou desativa se preferir.</p>
+    </div>
+  </div>
+</div>
+
+<!-- COMO FUNCIONA -->
+<div class="how-band">
+  <div class="section">
+    <div class="section-label">Como funciona</div>
+    <h2 class="section-title">Simples por fora,<br>sólido por dentro</h2>
+
+    <div class="steps">
+      <div class="step">
+        <h3>Escolha a senha mestra</h3>
+        <p>No primeiro uso você define uma senha. O LYRA deriva uma chave criptográfica dela — a senha em si nunca fica salva.</p>
+      </div>
+      <div class="step">
+        <h3>Adicione arquivos</h3>
+        <p>Mova fotos, vídeos ou documentos do armazenamento para o cofre — ou compartilhe direto da galeria.</p>
+      </div>
+      <div class="step">
+        <h3>Acesse quando precisar</h3>
+        <p>Desbloqueie com a senha, veja e reproduza seus arquivos normalmente. O app trava sozinho quando você sai.</p>
+      </div>
+      <div class="step">
+        <h3>Seus arquivos ficam no seu aparelho</h3>
+        <p>Nenhum servidor processa seus dados. Faça backup da chave para um pendrive e migre para qualquer dispositivo.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SEGURANÇA -->
+<div class="section">
+  <div class="security-split">
+    <div>
+      <div class="section-label">Criptografia</div>
+      <h2 class="section-title">Auditável.<br>Sem truques.</h2>
+      <p class="section-desc">
+        O formato .lyra usa apenas primitivos criptográficos consolidados, implementados
+        em Java puro sem dependências externas. Cada detalhe é inspecionável no código.
+      </p>
+      <div class="spec-list">
+        <div class="spec-item">
+          <div class="spec-dot"></div>
+          <div>
+            <strong>AES-256-GCM</strong>
+            <span>Cifra autenticada — detecta qualquer adulteração no arquivo</span>
+          </div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-dot"></div>
+          <div>
+            <strong>PBKDF2-SHA256 · 200 000 iterações</strong>
+            <span>Derivação custosa de chave — torna ataques de força bruta inviáveis</span>
+          </div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-dot"></div>
+          <div>
+            <strong>Nonce único por arquivo</strong>
+            <span>Nunca reutilizado; gerado pelo SecureRandom do sistema</span>
+          </div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-dot"></div>
+          <div>
+            <strong>fsync + verificação de SHA</strong>
+            <span>O original só é apagado após confirmar que o .lyra está íntegro no disco</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="crypto-card">
+      <div><span class="cc">// formato .lyra v1</span></div>
+      <div><span class="ck">magic</span>    <span class="cv">LYRA</span>  <span class="cc">// 4 bytes</span></div>
+      <div><span class="ck">version</span>  <span class="cv">01</span>    <span class="cc">// 1 byte</span></div>
+      <div><span class="ck">nonce</span>    <span class="cv">···</span>   <span class="cc">// 12 bytes (GCM IV)</span></div>
+      <div><span class="ck">salt</span>     <span class="cv">···</span>   <span class="cc">// 16 bytes</span></div>
+      <div><span class="ck">iter</span>     <span class="cv">200 000</span> <span class="cc">// 4 bytes</span></div>
+      <div><span class="ck">tag</span>      <span class="cv">···</span>   <span class="cc">// 16 bytes (autenticação)</span></div>
+      <div><span class="ck">payload</span>  <span class="cv">···</span>   <span class="cc">// dados cifrados</span></div>
+      <br>
+      <div><span class="cc">// chave = PBKDF2(senha, salt, iter)</span></div>
+      <div><span class="cc">// AES/GCM/NoPadding · 256 bits</span></div>
+      <br>
+      <div><span class="cs">✔ Autenticado</span>  <span class="cc">· integridade garantida</span></div>
+      <div><span class="cs">✔ Zero knowledge</span> <span class="cc">· senha nunca armazenada</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA FINAL -->
+<div class="cta-band">
+  <div class="cta-inner">
+    <h2>Seus arquivos merecem privacidade de verdade.</h2>
+    <p>Gratuito, sem rastreadores, sem conta. Instale agora.</p>
+    <a class="btn-primary" href="https://github.com/MarcioSchuenk/lyra-releases/releases/latest/download/lyra.apk">
+      ↓ Baixar LYRA para Android
+    </a>
+    <div>
+      <span class="version-badge">v0.10.0 · Lixeira e álbuns</span>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-logo">LYRA</span>
+  <ul class="footer-links">
+    <li><a href="https://github.com/MarcioSchuenk/lyra-releases">GitHub</a></li>
+    <li><a href="https://github.com/MarcioSchuenk/lyra-releases/releases">Versões</a></li>
+    <li><a href="https://github.com/MarcioSchuenk/lyra-releases/releases/latest/download/lyra.apk">Download</a></li>
+  </ul>
+  <span class="footer-note">Feito com cuidado · Sem rastreadores</span>
+</footer>
+
+<script>
+// Estrelas decorativas
+const container = document.getElementById('stars');
+for (let i = 0; i < 80; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random() * 2 + 0.5;
+  s.style.cssText = `
+    width:${size}px; height:${size}px;
+    left:${Math.random()*100}%; top:${Math.random()*100}%;
+    --d:${3+Math.random()*5}s;
+    --delay:-${Math.random()*6}s;
+    --o:${0.3+Math.random()*0.6};
+  `;
+  container.appendChild(s);
+}
+</script>
